@@ -3,6 +3,8 @@ import {GridContainer} from "./grid";
 import Text from "./Text";
 
 const fieldBuilder = (draft) => {
+    if (draft === undefined) return null;
+    
     var fields = [];
     draft.reduce((acc, val) => {
         draft.map(row => (
@@ -16,6 +18,8 @@ const fieldBuilder = (draft) => {
 };
 
 const recordBuilder = (draft, fields, state) => {
+    if (draft === undefined) return null;
+
     var records = [];
     for (var x = 0; x < draft.length; x++) {
         var record = new Array();
@@ -64,8 +68,8 @@ function Table(props) {
     const draft = props.draft;
     const fields = fieldBuilder(draft);
     const records = recordBuilder(draft, fields, state);
-    const fieldLength = fields.length;
-    const recordLength = draft.length;
+    const fieldLength = fields !== null ? fields.length : 0;
+    const recordLength = records !== null ? draft.length : 0;
 
     const clickHandler = (index) => {
         if (state !== index) {
@@ -100,13 +104,15 @@ function Table(props) {
     return (
         <>
         <Text>{props.tablename}</Text>
-        <GridContainer className = "table" rows = {`repeat(${recordLength + 1}, 1fr)`} columns = {`repeat(${fieldLength}, 1fr)`} style = {tableStyle}>
-            {fields.map(field => (
-                <Text className = "cells fields" onClick = {(event) => clickHandler(fields.indexOf(field))} style = {fieldStyle}>{field}</Text>
+        <GridContainer className = "table" rows = {`repeat(${props.field === false ? recordLength : recordLength + 1}, 1fr)`} columns = {`repeat(${fieldLength}, 1fr)`} style = {tableStyle}>
+            {props.field === false || fields === null ? null : 
+                fields.map(field => (
+                    <Text className = "cells fields" onClick = {(event) => clickHandler(fields.indexOf(field))} style = {fieldStyle}>{field}</Text>
             ))}
-            {records.map(record => (
-                record.map(cell => (
-                    <Text className = "cells records" style = {cellStyle}>{cell}</Text>
+            {records === null ? null : 
+                records.map(record => (
+                    record.map(cell => (
+                        <Text className = "cells records" style = {cellStyle}>{cell}</Text>
                 ))
             ))}
         </GridContainer>

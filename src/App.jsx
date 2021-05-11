@@ -49,6 +49,6 @@ const array = [
 
 export default (props) => (
 	<div className="App">
-        <Table tablename = "Example" draft = {array} />
+        <Table draft = {array}/>
 	</div>
 );
