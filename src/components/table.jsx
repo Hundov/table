@@ -1,7 +1,6 @@
 import * as React from "react";
 import {GridContainer} from "./grid";
 import Text from "./Text";
-import dataFilter from "./filter.js";
 
 const fieldBuilder = (draft) => {
     if (draft === undefined) return null;
