@@ -1,11 +1,13 @@
 import * as React from "react";
 import {GridContainer} from "./grid";
 import Text from "./Text";
+import dataFilter from "./filter.js";
 
 const fieldBuilder = (draft) => {
     if (draft === undefined) return null;
     
     var fields = [];
+
     draft.reduce((acc, val) => {
         draft.map(row => (
             row.map(item => (
@@ -17,21 +19,22 @@ const fieldBuilder = (draft) => {
     return fields;
 };
 
-const recordBuilder = (draft, fields, state) => {
+const recordBuilder = (draft, fieldsFilter, fieldOrderState) => {
     if (draft === undefined) return null;
 
     var records = [];
+
     for (var x = 0; x < draft.length; x++) {
         var record = new Array();
-        for (var i = 0; i < fields.length; i++) {
-            if (draft[x].some(row => row.bracket === fields[i]) === true) {
+        for (var i = 0; i < fieldsFilter.length; i++) {
+            if (draft[x].some(row => row.bracket === fieldsFilter[i]) === true) {
                 for (var z = 0; z < draft[x].length; z++) {
-                    if (fields[i] === draft[x][z].bracket) {
-                        record.splice(fields.indexOf(fields[i]), 0, draft[x][z].value);
+                    if (fieldsFilter[i] === draft[x][z].bracket) {
+                        record.splice(fieldsFilter.indexOf(fieldsFilter[i]), 0, draft[x][z].value);
                     };
                 };
             } else {
-                record.splice(fields.indexOf(fields[i]), 0, "");
+                record.splice(fieldsFilter.indexOf(fieldsFilter[i]), 0, "");
             };
         };
 
@@ -40,20 +43,20 @@ const recordBuilder = (draft, fields, state) => {
 
     const tableArrangement = (tableRows) => {
         const compare = (a, b) => {
-            if (a[state] < b[state]) {
+            if (a[fieldOrderState] < b[fieldOrderState]) {
                 return -1;
             };    
-            if (b[state] > a[state]) {
+            if (b[fieldOrderState] > a[fieldOrderState]) {
                 return 1;
             };   
             return 0;
         };
     
-        if (typeof state === "number") {
+        if (typeof fieldOrderState === "number") {
             tableRows.sort(compare);
         };
     
-        if (typeof state === "string") {
+        if (typeof fieldOrderState === "string") {
             tableRows.sort(compare).reverse();
         };
     };
@@ -64,18 +67,42 @@ const recordBuilder = (draft, fields, state) => {
 };
 
 function Table(props) {
-    const [state, setState] = React.useState();
     const draft = props.draft;
     const fields = fieldBuilder(draft);
-    const records = recordBuilder(draft, fields, state);
-    const fieldLength = fields !== null ? fields.length : 0;
+    const [fieldOrderState, setFieldOrderState] = React.useState();
+    const [fieldsFilter, setFieldsFilter] = React.useState([...fields]);
+    const records = recordBuilder(draft, fieldsFilter, fieldOrderState);
+    const fieldLength = fieldsFilter !== null ? fieldsFilter.length : 0;
     const recordLength = records !== null ? draft.length : 0;
 
-    const clickHandler = (index) => {
-        if (state !== index) {
-            setState(index);
+    const fieldOrderUpdater = (index) => {
+        if (fieldOrderState !== index) {
+            setFieldOrderState(index);
         } else {
-            setState(`${index}`);
+            setFieldOrderState(`${index}`);
+        };
+    };
+
+    const fieldsFilterUpdater = (event) => {
+        const name = event.target.name;
+        const checked = event.target.checked;
+
+        if (checked === true) {
+            var columnFilterCopy = [...fieldsFilter];
+            columnFilterCopy.splice(fields.indexOf(name), 0, name);
+            setFieldsFilter(columnFilterCopy);
+        } else {
+            setFieldsFilter(fieldsFilter.filter(item => item !== name));
+        };
+    };
+
+    const copyToClipboard = () => {
+        if (navigator.clipboard) {
+            const str1 = fieldsFilter.join("\t");
+            const arrayOfStrings = records.map(line => line.join("\t"));
+            const str2 = arrayOfStrings.join("\n");
+            const copiableString = str1 + "\n" + str2;
+            navigator.clipboard.writeText(copiableString);
         };
     };
 
@@ -101,13 +128,19 @@ function Table(props) {
         fontWeight: "bold",
     };
 
+
+
     return (
         <>
-        <Text>{props.tablename}</Text>
-        <GridContainer className = "table" rows = {`repeat(${props.field === false ? recordLength : recordLength + 1}, 1fr)`} columns = {`repeat(${fieldLength}, 1fr)`} style = {tableStyle}>
-            {props.field === false || fields === null ? null : 
-                fields.map(field => (
-                    <Text className = "cells fields" onClick = {(event) => clickHandler(fields.indexOf(field))} style = {fieldStyle}>{field}</Text>
+        <Text>{props.title}</Text>
+        {fields.map(field => (
+            <label><input name = {field} type = "checkbox" defaultChecked = {fieldsFilter.indexOf(field) !== -1 ? true : false} onChange = {(event) => fieldsFilterUpdater(event)}/>{field}</label>
+        ))}
+        <button onClick = {(event) => copyToClipboard()}>Copy to clipboard</button>
+        <GridContainer className = "table" rows = {`repeat(${props.showField === false ? recordLength : recordLength + 1}, 1fr)`} columns = {`repeat(${fieldLength}, 1fr)`} style = {tableStyle}>
+            {props.showField === false || fieldsFilter === null ? null : 
+                fieldsFilter.map(field => (
+                    <Text className = "cells fields" onClick = {(event) => fieldOrderUpdater(fields.indexOf(field))} style = {fieldStyle}>{field}</Text>
             ))}
             {records === null ? null : 
                 records.map(record => (
@@ -121,3 +154,4 @@ function Table(props) {
 };
 
 export default Table;
+
