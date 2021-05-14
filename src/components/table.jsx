@@ -1,6 +1,7 @@
 import * as React from "react";
 import {GridContainer} from "./grid";
 import Text from "./Text";
+import PopUp from "./popUp";
 
 const fieldBuilder = (draft) => {
     if (draft === undefined) return null;
@@ -70,6 +71,7 @@ function Table(props) {
     const fields = fieldBuilder(draft);
     const [fieldOrderState, setFieldOrderState] = React.useState();
     const [fieldsFilter, setFieldsFilter] = React.useState([...fields]);
+    const [visibility, setVisibility] = React.useState(false);
     const records = recordBuilder(draft, fieldsFilter, fieldOrderState);
     const fieldLength = fieldsFilter !== null ? fieldsFilter.length : 0;
     const recordLength = records !== null ? draft.length : 0;
@@ -105,6 +107,10 @@ function Table(props) {
         };
     };
 
+    const tableContainer = {
+        width: "fit-content"
+    };
+
     const tableStyle = {
         border: "0.01rem solid black",
         width: "fit-content",
@@ -127,28 +133,40 @@ function Table(props) {
         fontWeight: "bold",
     };
 
-
+    const icons = {
+        width: "16px",
+        heigth: "16px",
+        alignText: "center",
+        padding: "1px",
+        outline: "0.1px solid black",
+        cursor: "pointer"
+    };
 
     return (
-        <>
-        <Text>{props.title}</Text>
-        {fields.map(field => (
-            <label><input name = {field} type = "checkbox" defaultChecked = {fieldsFilter.indexOf(field) !== -1 ? true : false} onChange = {(event) => fieldsFilterUpdater(event)}/>{field}</label>
-        ))}
-        <button onClick = {(event) => copyToClipboard()}>Copy to clipboard</button>
-        <GridContainer className = "table" rows = {`repeat(${props.showField === false ? recordLength : recordLength + 1}, 1fr)`} columns = {`repeat(${fieldLength}, 1fr)`} style = {tableStyle}>
-            {props.showField === false || fieldsFilter === null ? null : 
-                fieldsFilter.map(field => (
-                    <Text className = "cells fields" onClick = {(event) => fieldOrderUpdater(fields.indexOf(field))} style = {fieldStyle}>{field}</Text>
-            ))}
-            {records === null ? null : 
-                records.map(record => (
-                    record.map(cell => (
-                        <Text className = "cells records" style = {cellStyle}>{cell}</Text>
-                ))
-            ))}
+        <GridContainer style = {tableContainer} rows = "auto auto" gap = "0.1rem">
+            <GridContainer columns = "8fr 1fr 1fr">
+                <Text>{props.title}</Text>
+                <img style = {icons} onClick = {(event) => setVisibility(!visibility)} src = "gear.svg"/>
+                {visibility ? <PopUp toggle = {setVisibility} content = {
+                    fields.map(field => (
+                        <label><input name = {field} type = "checkbox" defaultChecked = {fieldsFilter.indexOf(field) !== -1 ? true : false} onChange = {(event) => fieldsFilterUpdater(event)}/>{field}</label>
+                    ))
+                }/> : null}
+                <img style = {icons} onClick = {(event) => copyToClipboard()} src = "clipboard.svg"/>
+            </GridContainer>
+            <GridContainer className = "table" rows = {`repeat(${props.showField === false ? recordLength : recordLength + 1}, 1fr)`} columns = {`repeat(${fieldLength}, 1fr)`} style = {tableStyle}>
+                {props.showField === false || fieldsFilter === null ? null : 
+                    fieldsFilter.map(field => (
+                        <Text className = "cells fields" onClick = {(event) => fieldOrderUpdater(fields.indexOf(field))} style = {fieldStyle}>{field}</Text>
+                ))}
+                {records === null ? null : 
+                    records.map(record => (
+                        record.map(cell => (
+                            <Text className = "cells records" style = {cellStyle}>{cell}</Text>
+                    ))
+                ))}
+            </GridContainer>
         </GridContainer>
-        </>
     );
 };
 

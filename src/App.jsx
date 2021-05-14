@@ -46,7 +46,6 @@ const array = [
     ],
 ];
 
-
 export default (props) => (
 	<div className="App">
         <Table draft = {array}/>
