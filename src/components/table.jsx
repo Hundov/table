@@ -1,7 +1,7 @@
 import * as React from "react";
 import {GridContainer} from "./grid";
 import Text from "./Text";
-import PopUp from "./popUp";
+import {DropDown} from "./popUp";
 
 const fieldBuilder = (draft) => {
     if (draft === undefined) return null;
@@ -108,7 +108,7 @@ function Table(props) {
     };
 
     const tableContainer = {
-        width: "fit-content"
+        width: "fit-content",
     };
 
     const tableStyle = {
@@ -143,17 +143,19 @@ function Table(props) {
     };
 
     return (
-        <GridContainer style = {tableContainer} rows = "auto auto" gap = "0.1rem">
-            <GridContainer columns = "8fr 1fr 1fr">
+        <GridContainer style = {tableContainer} rows = "auto auto" gap = "0.5rem">
+            <GridContainer columns = "auto 20px 20px" gap = "0.5rem">
                 <Text>{props.title}</Text>
-                <img style = {icons} onClick = {(event) => setVisibility(!visibility)} src = "gear.svg"/>
-                {visibility ? <PopUp toggle = {setVisibility} content = {
-                    fields.map(field => (
-                        <label><input name = {field} type = "checkbox" defaultChecked = {fieldsFilter.indexOf(field) !== -1 ? true : false} onChange = {(event) => fieldsFilterUpdater(event)}/>{field}</label>
-                    ))
-                }/> : null}
+                <DropDown
+                    caller = {<img style = {icons} onClick = {(event) => setVisibility(!visibility)} src = "gear.svg"/>}
+                    content = {
+                        fields.map(field => (
+                            <label><input name = {field} type = "checkbox" defaultChecked = {fieldsFilter.indexOf(field) !== -1 ? true : false} onChange = {(event) => fieldsFilterUpdater(event)}/>{field}</label>
+                    ))}
+                />
                 <img style = {icons} onClick = {(event) => copyToClipboard()} src = "clipboard.svg"/>
             </GridContainer>
+
             <GridContainer className = "table" rows = {`repeat(${props.showField === false ? recordLength : recordLength + 1}, 1fr)`} columns = {`repeat(${fieldLength}, 1fr)`} style = {tableStyle}>
                 {props.showField === false || fieldsFilter === null ? null : 
                     fieldsFilter.map(field => (

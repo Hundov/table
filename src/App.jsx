@@ -9,11 +9,15 @@ const array = [
         },
         {
             bracket: "Games played",
-            value: "10"
+            value: "19"
         },
         {
-            bracket: "Winrate",
+            bracket: "Previous Winrate",
             value: "40%"
+        },
+        {
+            bracket: "Current Winrate",
+            value: "53%"
         }
     ],
     [
@@ -23,11 +27,15 @@ const array = [
         },
         {
             bracket: "Games played",
-            value: "11"
+            value: "17"
         },
         {
-            bracket: "Winrate",
+            bracket: "Previous Winrate",
             value: "45%"
+        },
+        {
+            bracket: "Current Winrate",
+            value: "53%"
         }
     ],
     [
@@ -37,12 +45,17 @@ const array = [
         },
         {
             bracket: "Games played",
-            value: "14"
+            value: "30"
         },
         {
-            bracket: "Winrate",
+            bracket: "Previous Winrate",
             value: "57%"
-        }
+        },
+        {
+            bracket: "Current Winrate",
+            value: "60%"
+        },
+        
     ],
 ];
 
