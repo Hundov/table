@@ -67,7 +67,7 @@ const DropDown = (props) => {
     )
 };
 
-const ToolTip = (props) => {
+const Tooltip = (props) => {
     const callerRef = React.useRef();
     const dropDownRef = React.useRef();
     const [visibility, setVisibility] = React.useState(false);
@@ -117,5 +117,5 @@ const ToolTip = (props) => {
     )
 };
 
-export {DropDown, ToolTip};
+export {DropDown, Tooltip};
 

@@ -1,7 +1,7 @@
 import * as React from "react";
 import {GridContainer} from "./grid";
 import Text from "./Text";
-import {DropDown} from "./popUp";
+import {DropDown, Tooltip} from "./popUp";
 
 const fieldBuilder = (draft) => {
     if (draft === undefined) return null;
@@ -72,6 +72,7 @@ function Table(props) {
     const [fieldOrderState, setFieldOrderState] = React.useState();
     const [fieldsFilter, setFieldsFilter] = React.useState([...fields]);
     const [visibility, setVisibility] = React.useState(false);
+    const [clipboardNotification, setClipboardNotification] = React.useState("Click here to copy the table's content to clipboard");
     const records = recordBuilder(draft, fieldsFilter, fieldOrderState);
     const fieldLength = fieldsFilter !== null ? fieldsFilter.length : 0;
     const recordLength = records !== null ? draft.length : 0;
@@ -82,6 +83,7 @@ function Table(props) {
         } else {
             setFieldOrderState(`${index}`);
         };
+        setClipboardNotification("Click here to copy the table's content to clipboard");
     };
 
     const fieldsFilterUpdater = (event) => {
@@ -95,6 +97,7 @@ function Table(props) {
         } else {
             setFieldsFilter(fieldsFilter.filter(item => item !== name));
         };
+        setClipboardNotification("Click here to copy the table's content to clipboard");
     };
 
     const copyToClipboard = () => {
@@ -105,6 +108,7 @@ function Table(props) {
             const copiableString = str1 + "\n" + str2;
             navigator.clipboard.writeText(copiableString);
         };
+        setClipboardNotification("Copied!");
     };
 
     const tableContainer = {
@@ -153,7 +157,11 @@ function Table(props) {
                             <label><input name = {field} type = "checkbox" defaultChecked = {fieldsFilter.indexOf(field) !== -1 ? true : false} onChange = {(event) => fieldsFilterUpdater(event)}/>{field}</label>
                     ))}
                 />
-                <img style = {icons} onClick = {(event) => copyToClipboard()} src = "clipboard.svg"/>
+                <Tooltip
+                    caller = {<img style = {icons} onClick = {(event) => copyToClipboard()} src = "clipboard.svg"/>}
+                    content = {clipboardNotification}
+                />
+                
             </GridContainer>
 
             <GridContainer className = "table" rows = {`repeat(${props.showField === false ? recordLength : recordLength + 1}, 1fr)`} columns = {`repeat(${fieldLength}, 1fr)`} style = {tableStyle}>
